@@ -35,14 +35,20 @@ uchar Load(ushort addr){
     }
 }
 void Push(uchar value){
+    if(stack_i == 255) throw "stack overflow";
     stack[stack_i++] = value;
 }
 uchar Pop(){
+    if(stack_i == 0) throw "stack underflow";
     return stack[--stack_i];
+}
+ushort PopAddr(){
+    return Pop() | (Pop() << 8);
 }
 extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
     int emucount = 0;
     uchar tmp = 0;
+    ushort addr = 0;
     while(emucount++ < 100000){
         switch(Load(pc)){
             case 0x00:
@@ -82,6 +88,28 @@ extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
                 break;
             case 0x0b:
                 Push(Pop() < Pop()); //スタックの都合で逆
+                break;
+            case 0x0c:
+                addr = PopAddr();
+                if(Pop()){
+                    pc = addr;
+                    continue;
+                }
+                break;
+            case 0x0d:
+                pc = PopAddr();
+                continue;
+            case 0x0e:
+                if(callstack_i == 255) throw "callstack overflow";
+                callstack[callstack_i++] = pc;
+                pc = PopAddr();
+                continue;
+            case 0x0f:
+                if(callstack_i == 0){
+                    throw "callstack underflow";
+                }else{
+                    pc = callstack[--callstack_i];
+                }
                 break;
         }
         pc++;
