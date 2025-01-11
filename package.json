@@ -1,0 +1,11 @@
+{
+  "name": "bge-wasm",
+  "version": "0.0.0",
+  "description": "BinGameEngine runtime for wasm(JavaScript)",
+
+  "main": "bin/runtime.cjs",
+  "module": "bin/runtime.mjs",
+
+  "author": "TNTSuperMan",
+  "license": "MIT"
+}
