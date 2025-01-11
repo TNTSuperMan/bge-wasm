@@ -42,6 +42,7 @@ uchar Pop(){
 }
 extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
     int emucount = 0;
+    uchar tmp = 0;
     while(emucount++ < 100000){
         switch(Load(pc)){
             case 0x00:
@@ -54,6 +55,33 @@ extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
                 break;
             case 0x03:
                 stack_i = 0;
+                break;
+            case 0x04:
+                Push(Pop() + Pop());
+                break;
+            case 0x05:
+                tmp = Pop();
+                Push(Pop() - tmp);
+                break;
+            case 0x06:
+                Push(Pop() * Pop());
+                break;
+            case 0x07:
+                tmp = Pop();
+                Push(Pop() / tmp);
+                break;
+            case 0x08:
+                tmp = Pop();
+                Push(Pop() % tmp);
+                break;
+            case 0x09:
+                Push(~(Pop() & Pop()));
+                break;
+            case 0x0a:
+                Push(Pop() == Pop());
+                break;
+            case 0x0b:
+                Push(Pop() < Pop()); //スタックの都合で逆
                 break;
         }
         pc++;
