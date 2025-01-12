@@ -9,6 +9,6 @@ export default (rom: Uint8Array, opt: {
     return {
         Load: a=>e._Load(a),
         Store: (a,v)=>e._Store(a,v),
-        Emulate: e._Emulate()
+        Emulate: ()=>e._Emulate()
     }
 })
