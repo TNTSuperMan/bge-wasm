@@ -50,17 +50,6 @@ extern "C" void EMSCRIPTEN_KEEPALIVE InitROM(uchar* addr, int length){
     for(int i = 0;i < length;i++)
         rom[i] = addr[i];
 }
-void Push(uchar value){
-    if(stack_i == 255) throw "stack overflow";
-    stack[stack_i++] = value;
-}
-uchar Pop(){
-    if(stack_i == 0) throw "stack underflow";
-    return stack[--stack_i];
-}
-ushort PopAddr(){
-    return Pop() | (Pop() << 8);
-}
 extern "C" uchar EMSCRIPTEN_KEEPALIVE Load(ushort addr){
     if(addr >= 0xa000){
         return ram[addr - 0xa000];
@@ -72,6 +61,17 @@ extern "C" void EMSCRIPTEN_KEEPALIVE Store(ushort addr, uchar value){
     if(addr >= 0xa000){
         ram[addr - 0xa000] = value;
     }
+}
+void Push(uchar value){
+    if(stack_i == 255) throw "stack overflow";
+    stack[stack_i++] = value;
+}
+uchar Pop(){
+    if(stack_i == 0) throw "stack underflow";
+    return stack[--stack_i];
+}
+ushort PopAddr(){
+    return Pop() | (Pop() << 8);
 }
 extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
     int emucount = 0;
