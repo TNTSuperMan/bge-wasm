@@ -116,6 +116,12 @@ extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
                     pc = callstack[--callstack_i];
                 }
                 break;
+            case 0x10:
+                Push(Load(PopAddr()));
+                break;
+            case 0x11:
+                Store(PopAddr(), Pop());
+                break;
         }
         pc++;
     }
