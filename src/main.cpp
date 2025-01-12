@@ -15,6 +15,7 @@ uchar* rom;
 uchar* ram;
 
 bool _doBreakBeforeDumpkey;
+uchar keyState;
 
 int main(){
     pc = 0;
@@ -28,10 +29,16 @@ int main(){
     rom = new uchar[0xa000];
     ram = new uchar[0x6000];
 
+    _doBreakBeforeDumpkey = false;
+    keyState = 0;
+
     return 0;
 }
 extern "C" void EMSCRIPTEN_KEEPALIVE DoBreakBeforeDumpkey(bool value){
     _doBreakBeforeDumpkey = value;
+}
+extern "C" void EMSCRIPTEN_KEEPALIVE SetKeyState(uchar state){
+    keyState = state;
 }
 extern "C" uchar* EMSCRIPTEN_KEEPALIVE Malloc(int length){
     return new uchar[length];
@@ -137,6 +144,9 @@ extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
                 break;
             case 0x11:
                 Store(PopAddr(), Pop());
+                break;
+            case 0x12:
+                Push(keyState);
                 break;
         }
         pc++;
