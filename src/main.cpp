@@ -14,6 +14,8 @@ uchar callstack_i;
 uchar* rom;
 uchar* ram;
 
+bool _doBreakBeforeDumpkey;
+
 int main(){
     pc = 0;
 
@@ -27,6 +29,9 @@ int main(){
     ram = new uchar[0x6000];
 
     return 0;
+}
+extern "C" void EMSCRIPTEN_KEEPALIVE DoBreakBeforeDumpkey(bool value){
+    _doBreakBeforeDumpkey = value;
 }
 extern "C" uchar* EMSCRIPTEN_KEEPALIVE Malloc(int length){
     return new uchar[length];
@@ -135,6 +140,7 @@ extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
                 break;
         }
         pc++;
+        if(_doBreakBeforeDumpkey && Load(pc) == 0x12) return;
     }
    return;
 }
