@@ -28,6 +28,9 @@ int main(){
 
     return 0;
 }
+extern "C" uchar* EMSCRIPTEN_KEEPALIVE Malloc(int length){
+    return new uchar[length];
+}
 extern "C" void EMSCRIPTEN_KEEPALIVE InitROM(uchar* addr, int length){
     for(int i = 0;i < length;i++)
         rom[i] = addr[i];
