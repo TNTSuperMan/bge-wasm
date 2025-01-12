@@ -27,13 +27,6 @@ int main(){
 
     return 0;
 }
-uchar Load(ushort addr){
-    if(addr >= 0xa000){
-        return ram[addr - 0xa000];
-    }else{
-        return rom[addr];
-    }
-}
 void Push(uchar value){
     if(stack_i == 255) throw "stack overflow";
     stack[stack_i++] = value;
@@ -44,6 +37,18 @@ uchar Pop(){
 }
 ushort PopAddr(){
     return Pop() | (Pop() << 8);
+}
+extern "C" uchar EMSCRIPTEN_KEEPALIVE Load(ushort addr){
+    if(addr >= 0xa000){
+        return ram[addr - 0xa000];
+    }else{
+        return rom[addr];
+    }
+}
+extern "C" void EMSCRIPTEN_KEEPALIVE Store(ushort addr, uchar value){
+    if(addr >= 0xa000){
+        ram[addr - 0xa000] = value;
+    }
 }
 extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
     int emucount = 0;
