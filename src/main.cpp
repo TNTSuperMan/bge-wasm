@@ -23,6 +23,7 @@ int main(){
     callstack = new ushort[256];
     callstack_i = 0;
 
+    rom = new uchar[0xa000];
     ram = new uchar[0x6000];
 
     return 0;
@@ -126,4 +127,8 @@ extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
         pc++;
     }
    return;
+}
+extern "C" void EMSCRIPTEN_KEEPALIVE InitROM(uchar* addr, int length){
+    for(int i = 0;i < length;i++)
+        rom[i] = addr[i];
 }
