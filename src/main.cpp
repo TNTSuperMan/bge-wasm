@@ -28,6 +28,10 @@ int main(){
 
     return 0;
 }
+extern "C" void EMSCRIPTEN_KEEPALIVE InitROM(uchar* addr, int length){
+    for(int i = 0;i < length;i++)
+        rom[i] = addr[i];
+}
 void Push(uchar value){
     if(stack_i == 255) throw "stack overflow";
     stack[stack_i++] = value;
@@ -127,8 +131,4 @@ extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
         pc++;
     }
    return;
-}
-extern "C" void EMSCRIPTEN_KEEPALIVE InitROM(uchar* addr, int length){
-    for(int i = 0;i < length;i++)
-        rom[i] = addr[i];
 }
