@@ -17,6 +17,8 @@ uchar* ram;
 bool _doBreakBeforeDumpkey;
 uchar keyState;
 
+uchar ioState;
+
 int main(){
     pc = 0;
 
@@ -32,6 +34,8 @@ int main(){
     _doBreakBeforeDumpkey = false;
     keyState = 0;
 
+    ioState = 255;
+
     return 0;
 }
 extern "C" void EMSCRIPTEN_KEEPALIVE DoBreakBeforeDumpkey(bool value){
@@ -39,6 +43,12 @@ extern "C" void EMSCRIPTEN_KEEPALIVE DoBreakBeforeDumpkey(bool value){
 }
 extern "C" void EMSCRIPTEN_KEEPALIVE SetKeyState(uchar state){
     keyState = state;
+}
+extern "C" bool EMSCRIPTEN_KEEPALIVE IOState(){
+    return ioState;
+}
+extern "C" uchar* EMSCRIPTEN_KEEPALIVE GetIOPtr(){
+    return rom + 0x5000;
 }
 extern "C" uchar* EMSCRIPTEN_KEEPALIVE Malloc(int length){
     return new uchar[length];
@@ -74,6 +84,7 @@ ushort PopAddr(){
     return Pop() | (Pop() << 8);
 }
 extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
+    if(ioState != 255) ioState = 255;
     int emucount = 0;
     uchar tmp = 0;
     ushort addr = 0;
@@ -148,6 +159,16 @@ extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
             case 0x12:
                 Push(keyState);
                 break;
+            
+            case 0x18:
+                ioState = Pop();
+                if(ioState == 4 || ioState == 3){
+                    for(ushort i = 0x5000;i < 0x6000;i++)
+                        ram[i] = 0;
+                    ioState = 255;
+                    break;
+                }
+                return;
         }
         pc++;
         if(_doBreakBeforeDumpkey && Load(pc) == 0x12) return;
