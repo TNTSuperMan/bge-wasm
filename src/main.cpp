@@ -1,4 +1,5 @@
 #include <emscripten.h>
+#include <string>
 
 typedef unsigned short ushort;
 typedef unsigned char uchar;
@@ -19,6 +20,8 @@ uchar keyState;
 
 uchar ioState;
 
+std::string gsStack;
+
 int main(){
     pc = 0;
 
@@ -35,6 +38,8 @@ int main(){
     keyState = 0;
 
     ioState = 255;
+
+    gsStack = "";
 
     return 0;
 }
@@ -159,7 +164,9 @@ extern "C" void EMSCRIPTEN_KEEPALIVE Emulate(){
             case 0x12:
                 Push(keyState);
                 break;
-            
+            case 0x13:
+                gsStack = "E" + gsStack;
+                return;
             case 0x18:
                 ioState = Pop();
                 if(ioState == 4 || ioState == 3){
